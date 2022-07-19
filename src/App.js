@@ -1,9 +1,16 @@
 //@ts-check
 import './App.css';
-import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
-import { useRef } from 'react';
+import {
+	Canvas,
+	useFrame,
+	extend,
+	useThree,
+	useLoader,
+} from '@react-three/fiber';
+import { Suspense, useRef } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
+import { TextureLoader } from 'three';
 extend({ OrbitControls });
 
 const Orbit = () => {
@@ -13,15 +20,17 @@ const Orbit = () => {
 
 const Box = (props) => {
 	const ref = useRef();
+	const texture = useLoader(TextureLoader, '/csteel.jpg');
 
 	useFrame((state) => {
+		ref.current.rotation.x += 0.01;
 		ref.current.rotation.y += 0.01;
 	});
 
 	return (
-		<mesh ref={ref} {...props} castShadow receiveShadow>
+		<mesh ref={ref} {...props} castShadow>
 			<boxGeometry />
-			<meshStandardMaterial color={'red'} opacity={0.5} transparent />
+			<meshPhysicalMaterial map={texture} />
 		</mesh>
 	);
 };
@@ -35,6 +44,17 @@ const Floor = (props) => {
 	);
 };
 
+const Background = (props) => {
+	const texture = useLoader(TextureLoader, '/autoshop.jpeg');
+	const { gl } = useThree();
+
+	const formated = new THREE.WebGLCubeRenderTarget(
+		texture.image.height
+	).fromEquirectangularTexture(gl, texture);
+
+	return <primitive attach='background' object={formated} />;
+};
+
 const Bulb = (props) => {
 	return (
 		<mesh {...props}>
@@ -46,14 +66,6 @@ const Bulb = (props) => {
 };
 
 function App() {
-	const points = [];
-	points.push(new THREE.Vector3(-1, 0, 0));
-	points.push(new THREE.Vector3(0, 1, 0));
-	points.push(new THREE.Vector3(1, 0, 0));
-	points.push(new THREE.Vector3(0, 5, 0));
-
-	const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
 	return (
 		<div style={{ height: '100vh', width: '100vw' }}>
 			<Canvas
@@ -61,9 +73,13 @@ function App() {
 				camera={{ position: [1, 3, 1] }}
 				shadows
 			>
-				<fog attach='fog' args={['white', 1, 10]} />
 				<ambientLight intensity={0.2} />
-				<Box position={[0, 1, 0]} />
+				<Suspense fallback={null}>
+					<Box position={[0, 1, 0]} />
+				</Suspense>
+				<Suspense fallback={null}>
+					<Background />
+				</Suspense>
 				<Bulb position={[0, 3, 0]} />
 				<Orbit />
 				<axesHelper args={[5]} />
