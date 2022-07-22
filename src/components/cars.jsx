@@ -41,6 +41,15 @@ const Cars = (props) => {
           />
         </BoundingBox>
       </Draggable>
+      <BoundingBox
+        position={[-2, 0, 0]}
+        dims={[2, 1, 3]}
+        offset={[0, -0.2, 0.2]}
+      >
+        <group rotation={[0, Math.PI, 0]}>
+          <Model path="/mech_drone/scene.gltf" scale={new Array(3).fill(2)} />
+        </group>
+      </BoundingBox>
     </>
   );
 };

@@ -2,16 +2,16 @@ import "./App.css";
 import { Canvas, extend } from "@react-three/fiber";
 import { Suspense } from "react";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Physics } from "@react-three/cannon";
 import Box from "./components/box";
 import Background from "./components/background";
-import Bulb from "./components/bulb";
 import Orbit from "./components/orbit";
 import Floor from "./components/floor";
 import ColorPicker from "./components/colorPicker";
-import { Physics } from "@react-three/cannon";
 import Cars from "./components/cars";
 import CameraControls from "./components/cameraControls";
 import CameraButtons from "./components/cameraButton";
+import Lights from "./components/lights";
 extend({ OrbitControls });
 
 function App() {
@@ -25,19 +25,9 @@ function App() {
         shadows
       >
         <CameraControls />
-        <ambientLight intensity={0.2} />
-        <directionalLight
-          position={[6, 3, 0]}
-          intensity={2}
-          castShadow
-          shadow-mapSize-height={2 ** 8}
-          shadow-mapSize-width={2 ** 8}
-        />
+        <Lights />
         <Orbit />
         <axesHelper args={[5]} />
-        <Bulb position={[3.5, 2, 0]} />
-        <Bulb position={[0, 2, 0]} />
-        <Bulb position={[-3.5, 2, 0]} />
         <Physics>
           <Suspense fallback={null}>
             <Cars />
